@@ -1,10 +1,6 @@
 ---
 # defaults file for ansible-kvm
 
-# Defines if ssh should be configured to allow root logins
-# mainly for managing KVM/Libvirt remotely using virt-manager or other.
-kvm_allow_root_ssh: false
-
 # This setting allows usage of the auditing subsystem to be altered:
 #
 #   audit_level == 0  -> disable all auditing
