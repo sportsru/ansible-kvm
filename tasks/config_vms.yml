@@ -43,23 +43,23 @@
     item[0]['host'] is defined and
     inventory_hostname == item[0]['host']
 
-- name: config_vms | Setting VM State
-  virt:
-    name: "{{ item['name'] }}"
-    state: "{{ item['state'] }}"
-  become: true
-  with_items: "{{ kvm_vms }}"
-  when: item['host'] is not defined
+# - name: config_vms | Setting VM State
+#   virt:
+#     name: "{{ item['name'] }}"
+#     state: "{{ item['state'] }}"
+#   become: true
+#   with_items: "{{ kvm_vms }}"
+#   when: item['host'] is not defined
 
-- name: config_vms | Setting VM State
-  virt:
-    name: "{{ item['name'] }}"
-    state: "{{ item['state'] }}"
-  become: true
-  with_items: "{{ kvm_vms }}"
-  when: >
-    item['host'] is defined and
-    inventory_hostname == item['host']
+# - name: config_vms | Setting VM State
+#   virt:
+#     name: "{{ item['name'] }}"
+#     state: "{{ item['state'] }}"
+#   become: true
+#   with_items: "{{ kvm_vms }}"
+#   when: >
+#     item['host'] is defined and
+#     inventory_hostname == item['host']
 
 - name: config_vms | Setting autostart status
   virt:
