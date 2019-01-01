@@ -16,9 +16,3 @@
   become: true
   when: not ansible_check_mode
 
-- name: restart ssh
-  service:
-    name: "ssh"
-    state: "restarted"
-  become: true
-  when: not ansible_check_mode
