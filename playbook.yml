@@ -1,0 +1,25 @@
+---
+- hosts: all
+  become: true
+  vars:
+    kvm_config: true
+    kvm_manage_vms: true
+    kvm_vms:
+      - name: 'testhost1'
+        autostart: true
+        boot_devices:
+          - 'hd'
+        memory: '512'
+        state: 'running'
+        vcpu: '1'
+        disks:
+          - disk_driver: 'virtio'
+            name: 'testhost1-disk'
+            size: '36864'
+        network_interfaces:
+          - source: 'default'
+            network_driver: 'virtio'
+            type: 'network'
+  roles:
+    - role: ansible-kvm
+
