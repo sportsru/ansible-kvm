@@ -12,7 +12,7 @@ vagrant:
     - name: virtualbox
       type: virtualbox
       options:
-        memory: 512
+        memory: 1536
         cpus: 2
   instances:
     - name: ansible-kvm
