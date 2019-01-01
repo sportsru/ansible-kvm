@@ -24,13 +24,6 @@
     kvm_config_users and
     kvm_users is defined
 
-- include: config_ssh.yml
-  tags:
-    - config_ssh
-  when: >
-    kvm_allow_root_ssh is defined and
-    kvm_allow_root_ssh
-
 - include: config_virtual_networks.yml
   tags:
     - config_virtual_networks
