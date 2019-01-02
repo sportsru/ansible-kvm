@@ -15,7 +15,7 @@
 
 # ansible-kvm
 
-An [Ansible](https://www.ansible.com) role to install [KVM](https://www.linux-kvm.org/page/Main_Page)
+An [Ansible](https://www.ansible.com) role to install [KVM](https://www.linux-kvm.org/page/Main_Page).  Modified from the Larry J. Smith version for Nefeli.
 
 ## Build Status
 
