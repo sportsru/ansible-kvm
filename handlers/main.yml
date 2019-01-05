@@ -16,3 +16,11 @@
   become: true
   when: not ansible_check_mode
 
+- name: reload apparmor profiles
+  command: "apparmor_parser -R {{ item }}"
+  become: true
+  with_items:
+    - /etc/apparmor.d/usr.sbin.libvirtd
+    - /etc/apparmor.d/usr.lib.libvirt.virt-aa-helper
+  when:
+    - not ansible_check_mode
