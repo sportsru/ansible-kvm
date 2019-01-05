@@ -1,9 +1,16 @@
 ---
 - hosts: all
+  gather_facts: no
+  tasks:
+    - name: pre-apply apt-get update
+      raw: apt-get update
+  
+- hosts: all
   become: true
   vars:
     kvm_config: true
     kvm_manage_vms: true
+    kvm_disable_apparmor: true
     kvm_vms:
       - name: 'testhost1'
         autostart: true
@@ -22,4 +29,3 @@
             type: 'network'
   roles:
     - role: ansible-kvm
-

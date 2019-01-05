@@ -5,6 +5,12 @@ driver:
   name: vagrant
 vagrant:
   platforms:
+    - name: ubuntu1804
+      box: geerlingguy/ubuntu1804
+      box_url: https://vagrantcloud.com/geerlingguy/boxes/ubuntu1804/versions/1.0.5/providers/virtualbox.box
+    - name: ubuntu1604
+      box: geerlingguy/ubuntu1604
+      box_url: https://vagrantcloud.com/geerlingguy/boxes/ubuntu1604/versions/1.2.4/providers/virtualbox.box
     - name: ubuntu/trusty64
       box: trusty64
       box_url: https://vagrantcloud.com/ubuntu/boxes/trusty64/versions/14.04/providers/virtualbox.box
