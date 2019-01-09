@@ -8,7 +8,7 @@
   become: true
   with_items: "{{ kvm_storage_pools }}"
 
-- name: config_virtual networks | setting state of storage pools
+- name: config_storage_pools | setting state of storage pools
   virt_pool:
     state: "{{ item['state'] }}"
     name: "{{ item['name'] }}"
@@ -16,7 +16,7 @@
   with_items: "{{ kvm_storage_pools }}"
   when: item['state'] is defined
 
-- name: config_storage pools | setting storage pools to autostart
+- name: config_storage_pools | setting storage pools to autostart
   virt_pool:
     autostart: yes
     name: "{{ item['name'] }}"
@@ -28,7 +28,7 @@
       (item['state'] is defined and
         item['state'] == "active")
 
-- name: config_storage pools | setting storage pools to not autostart
+- name: config_storage_pools | setting storage pools to not autostart
   virt_pool:
     autostart: no
     name: "{{ item['name'] }}"
