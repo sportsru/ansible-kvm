@@ -2,8 +2,10 @@
 - hosts: all
   gather_facts: no
   tasks:
-    - name: pre-apply apt-get update
-      raw: apt-get update
+    - name: update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
   
 - hosts: all
   become: true
