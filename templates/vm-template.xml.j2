@@ -28,6 +28,13 @@
 {%   endif %}
     </disk>
 {% endfor %}
+{% for cdrom in item.cdroms|default([]) %}
+    <disk type='file' device='cdrom'>
+      <source file='{{ cdrom.source }}' />
+      <target dev='hda' bus='ide'/>
+      <readonly/>
+    </disk>
+{% endfor %}
 {% for int in item.network_interfaces %}
     <interface type='{{ int.type }}'>
 {%   if int['portgroup'] is not defined %}

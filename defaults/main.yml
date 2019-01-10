@@ -253,6 +253,7 @@ kvm_vms:
   #     - disk_driver: 'virtio'
   #       name: 'test_vm.1'
   #       size: '36864'
+  #       image: /tmp/bionic-server-cloudimg-amd64.img
   #     - disk_driver: 'virtio'
   #       name: 'test_vm.2'
   #       size: '51200'

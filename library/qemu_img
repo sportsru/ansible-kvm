@@ -96,7 +96,7 @@ def main():
                     module.run_command('%s create -f %s -o %s "%s" %s'%(qemu_img, img_format, opt, dest, size), check_rc=True)
             changed = True
         else:
-            rc, stdout, _ = module.run_command('%s info "%s"'%(qemu_img, dest), check_rc=True)
+            rc, stdout, _ = module.run_command('%s info -U "%s"'%(qemu_img, dest), check_rc=True)
             current_size = None
             for line in stdout.splitlines():
                 if 'virtual size' in line:

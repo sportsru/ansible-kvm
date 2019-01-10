@@ -6,7 +6,15 @@
       apt:
         update_cache: yes
         cache_valid_time: 3600
-  
+
+- hosts: all
+  tasks:
+    - name: download test image
+      get_url:
+        url: "https://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img"
+        dest: /tmp/ubuntu.img
+        
+# VM with empty disk
 - hosts: all
   become: true
   vars:
@@ -25,6 +33,35 @@
           - disk_driver: 'virtio'
             name: 'testhost1-disk'
             size: '36864'
+        network_interfaces:
+          - source: 'default'
+            network_driver: 'virtio'
+            type: 'network'
+  roles:
+    - role: ansible-kvm
+
+# VM with a defined disk config
+- hosts: all
+  become: true
+  vars:
+    kvm_config: true
+    kvm_manage_vms: true
+    kvm_disable_apparmor: true
+    kvm_vms:
+      - name: 'testhost2'
+        autostart: true
+        boot_devices:
+          - 'hd'
+        memory: '512'
+        state: 'running'
+        vcpu: '1'
+        disks:
+          - disk_driver: 'virtio'
+            name: 'testhost2-disk'
+            image: '/tmp/ubuntu.img'
+            size: '8192'
+#        cdroms:
+#          - source: /tmp/example.iso
         network_interfaces:
           - source: 'default'
             network_driver: 'virtio'

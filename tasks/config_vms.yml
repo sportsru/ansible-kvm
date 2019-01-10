@@ -19,7 +19,7 @@
     item['host'] is defined and
     inventory_hostname == item['host']
 
-- name: config_vms | Creating VM Disk(s)
+- name: config_vms | Creating VM Disk(s), undefined host, empty disk
   qemu_img:
     dest: "{{ kvm_images_path }}/{{ item[1]['name'] }}.{{ kvm_images_format_type }}"
     size: "{{ item[1]['size'] }}"
@@ -28,9 +28,40 @@
   with_subelements:
     - "{{ kvm_vms }}"
     - disks
-  when: item[0]['host'] is not defined
+  when: >
+    item[0]['host'] is not defined and
+    item[1]['image'] is not defined
 
-- name: config_vms | Creating VM Disk(s)
+- name: config_vms | Creating VM Disk(s), undefined host, primed disk, fetch
+  copy:
+    dest: "{{ kvm_images_path }}/{{ item[1]['name'] }}.{{ kvm_images_format_type }}"
+    src: "{{ item[1]['image'] }}"
+    remote_src: yes
+    force: no
+  register: new_image
+  become: true
+  with_subelements:
+    - "{{ kvm_vms }}"
+    - disks
+  when: >
+    item[0]['host'] is not defined and
+    item[1]['image'] is defined
+
+- name: config_vms | Creating VM Disk(s), undefined host, primed disk, resize
+  qemu_img:
+    dest: "{{ kvm_images_path }}/{{ item[1]['name'] }}.{{ kvm_images_format_type }}"
+    size: "{{ item[1]['size'] }}"
+  become: true
+  with_subelements:
+    - "{{ kvm_vms }}"
+    - disks
+  when: >
+    item[0]['host'] is not defined and
+    item[1]['image'] is defined and
+    item[1]['size'] is defined and
+    new_image.changed
+
+- name: config_vms | Creating VM Disk(s), defined host, empty disk
   qemu_img:
     dest: "{{ kvm_images_path }}/{{ item[1]['name'] }}.{{ kvm_images_format_type }}"
     size: "{{ item[1]['size'] }}"
@@ -42,6 +73,37 @@
   when: >
     item[0]['host'] is defined and
     inventory_hostname == item[0]['host']
+
+- name: config_vms | Creating VM Disk(s), defined host, primed disk, fetch
+  copy:
+    dest: "{{ kvm_images_path }}/{{ item[1]['name'] }}.{{ kvm_images_format_type }}"
+    src: "{{ item[1]['image'] }}"
+    remote_src: yes
+    force: no
+  register: new_image
+  become: true
+  with_subelements:
+    - "{{ kvm_vms }}"
+    - disks
+  when: >
+    item[0]['host'] is defined and
+    inventory_hostname == item[0]['host'] and
+    item[1]['image'] is defined
+
+- name: config_vms | Creating VM Disk(s), defined host, primed disk, resize
+  qemu_img:
+    dest: "{{ kvm_images_path }}/{{ item[1]['name'] }}.{{ kvm_images_format_type }}"
+    size: "{{ item[1]['size'] }}"
+  become: true
+  with_subelements:
+    - "{{ kvm_vms }}"
+    - disks
+  when: >
+    item[0]['host'] is defined and
+    inventory_hostname == item[0]['host'] and
+    item[1]['image'] is defined and
+    item[1]['size'] is defined and
+    new_image.changed
 
 - name: config_vms | Setting VM State
   virt:
