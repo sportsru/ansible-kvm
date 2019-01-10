@@ -257,6 +257,8 @@ kvm_vms:
   #     - disk_driver: 'virtio'
   #       name: 'test_vm.2'
   #       size: '51200'
+  #   cdroms:
+  #     - source: /tmp/cdrom.iso
   #   # Define a specific host where the VM should reside..Match inventory_hostname
   #   # host: 'kvm01'
   #   # Define memory in MB
