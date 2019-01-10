@@ -31,7 +31,7 @@
 {% for cdrom in item.cdroms|default([]) %}
     <disk type='file' device='cdrom'>
       <source file='{{ cdrom.source }}' />
-      <target dev='hda' bus='ide'/>
+      <target dev='sr{{ "0123456789"[loop.index0] }}' bus='ide'/>
       <readonly/>
     </disk>
 {% endfor %}
