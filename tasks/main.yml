@@ -17,6 +17,11 @@
     - config_kvm
   when: kvm_config
 
+- include: apparmor.yml
+  when: >
+    ansible_os_family == "Debian" and
+    kvm_disable_apparmor
+
 - include: users.yml
   tags:
     - config_users
@@ -49,7 +54,3 @@
 - include: system_tweaks.yml
   when: kvm_enable_system_tweaks
 
-- include: apparmor.yml
-  when: >
-    ansible_os_family == "Debian" and
-    kvm_disable_apparmor
