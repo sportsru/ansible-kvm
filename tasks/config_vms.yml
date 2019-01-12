@@ -72,7 +72,7 @@
     - disks
   when: >
     item[0]['host'] is defined and
-    inventory_hostname == item[0]['host']
+    inventory_hostname == item[0]['host'] and
     item[1]['image'] is undefined
 
 - name: config_vms | Creating VM Disk(s), defined host, primed disk, fetch
