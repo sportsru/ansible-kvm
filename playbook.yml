@@ -66,5 +66,6 @@
           - source: 'default'
             network_driver: 'virtio'
             type: 'network'
+            slot: '5'
   roles:
     - role: ansible-kvm
