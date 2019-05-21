@@ -6,60 +6,8 @@
     xml: "{{ lookup('template', 'vm-template.xml.j2') }}"
   become: true
   with_items: "{{ kvm_vms }}"
-  when: item['host'] is not defined
-
-- name: config_vms | Defining VM(s)
-  virt:
-    name: "{{ item['name'] }}"
-    command: define
-    xml: "{{ lookup('template', 'vm-template.xml.j2') }}"
-  become: true
-  with_items: "{{ kvm_vms }}"
   when: >
-    item['host'] is defined and
-    inventory_hostname == item['host']
-
-- name: config_vms | Creating VM Disk(s), undefined host, empty disk
-  qemu_img:
-    dest: "{{ kvm_images_path }}/{{ item[1]['name'] }}.{{ kvm_images_format_type }}"
-    size: "{{ item[1]['size'] }}"
-    format: "{{ kvm_images_format_type }}"
-  become: true
-  with_subelements:
-    - "{{ kvm_vms }}"
-    - disks
-  when: >
-    item[0]['host'] is not defined and
-    item[1]['image'] is not defined
-
-- name: config_vms | Creating VM Disk(s), undefined host, primed disk, fetch
-  copy:
-    dest: "{{ kvm_images_path }}/{{ item[1]['name'] }}.{{ kvm_images_format_type }}"
-    src: "{{ item[1]['image'] }}"
-    remote_src: yes
-    force: no
-  register: new_image
-  become: true
-  with_subelements:
-    - "{{ kvm_vms }}"
-    - disks
-  when: >
-    item[0]['host'] is not defined and
-    item[1]['image'] is defined
-
-- name: config_vms | Creating VM Disk(s), undefined host, primed disk, resize
-  qemu_img:
-    dest: "{{ kvm_images_path }}/{{ item[1]['name'] }}.{{ kvm_images_format_type }}"
-    size: "{{ item[1]['size'] }}"
-  become: true
-  with_subelements:
-    - "{{ kvm_vms }}"
-    - disks
-  when: >
-    item[0]['host'] is not defined and
-    item[1]['image'] is defined and
-    item[1]['size'] is defined and
-    new_image.changed
+    item['host']|default(inventory_hostname) == inventory_hostname
 
 - name: config_vms | Creating VM Disk(s), defined host, empty disk
   qemu_img:
@@ -71,8 +19,7 @@
     - "{{ kvm_vms }}"
     - disks
   when: >
-    item[0]['host'] is defined and
-    inventory_hostname == item[0]['host'] and
+    item[0]['host']|default(inventory_hostname) == inventory_hostname and
     item[1]['image'] is undefined
 
 - name: config_vms | Creating VM Disk(s), defined host, primed disk, fetch
@@ -87,8 +34,7 @@
     - "{{ kvm_vms }}"
     - disks
   when: >
-    item[0]['host'] is defined and
-    inventory_hostname == item[0]['host'] and
+    item[0]['host']|default(inventory_hostname) == inventory_hostname and
     item[1]['image'] is defined
 
 - name: config_vms | Creating VM Disk(s), defined host, primed disk, resize
@@ -100,8 +46,7 @@
     - "{{ kvm_vms }}"
     - disks
   when: >
-    item[0]['host'] is defined and
-    inventory_hostname == item[0]['host'] and
+    item[0]['host']|default(inventory_hostname) == inventory_hostname and
     item[1]['image'] is defined and
     item[1]['size'] is defined and
     new_image.changed
@@ -112,17 +57,8 @@
     state: "{{ item['state'] }}"
   become: true
   with_items: "{{ kvm_vms }}"
-  when: item['host'] is not defined
-
-- name: config_vms | Setting VM State
-  virt:
-    name: "{{ item['name'] }}"
-    state: "{{ item['state'] }}"
-  become: true
-  with_items: "{{ kvm_vms }}"
   when: >
-    item['host'] is defined and
-    inventory_hostname == item['host']
+    item['host']|default(inventory_hostname) == inventory_hostname
 
 - name: config_vms | Setting autostart status
   virt:
@@ -132,17 +68,5 @@
   become: true
   with_items: "{{ kvm_vms }}"
   when: >
-    item['host'] is not defined and
-    (ansible_version.full is version_compare('2.3', '>='))
-
-- name: config_vms | Setting autostart status
-  virt:
-    name: "{{ item['name'] }}"
-    autostart: "{{ item['autostart']|default(omit) }}"
-    command: info
-  become: true
-  with_items: "{{ kvm_vms }}"
-  when: >
-    item['host'] is defined and
-    inventory_hostname == item['host'] and
+    item['host']|default(inventory_hostname) == inventory_hostname and
     (ansible_version.full is version_compare('2.3', '>='))
