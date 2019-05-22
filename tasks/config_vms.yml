@@ -9,7 +9,7 @@
   when: >
     item['host']|default(inventory_hostname) == inventory_hostname
 
-- name: config_vms | Creating VM Disk(s), defined host, empty disk
+- name: config_vms | Creating VM Disk(s), file type, empty disk
   qemu_img:
     dest: "{{ kvm_images_path }}/{{ item[1]['name'] }}.{{ kvm_images_format_type }}"
     size: "{{ item[1]['size'] }}"
@@ -20,24 +20,26 @@
     - disks
   when: >
     item[0]['host']|default(inventory_hostname) == inventory_hostname and
+    item[1]['type']|default('file') == 'file' and
     item[1]['image'] is undefined
 
-- name: config_vms | Creating VM Disk(s), defined host, primed disk, fetch
+- name: config_vms | Creating VM Disk(s), file type, primed disk, fetch
   copy:
     dest: "{{ kvm_images_path }}/{{ item[1]['name'] }}.{{ kvm_images_format_type }}"
     src: "{{ item[1]['image'] }}"
     remote_src: yes
     force: no
-  register: new_image
+  register: new_image_file
   become: true
   with_subelements:
     - "{{ kvm_vms }}"
     - disks
   when: >
     item[0]['host']|default(inventory_hostname) == inventory_hostname and
+    item[1]['type']|default('file') == 'file' and
     item[1]['image'] is defined
 
-- name: config_vms | Creating VM Disk(s), defined host, primed disk, resize
+- name: config_vms | Creating VM Disk(s), file type, primed disk, resize
   qemu_img:
     dest: "{{ kvm_images_path }}/{{ item[1]['name'] }}.{{ kvm_images_format_type }}"
     size: "{{ item[1]['size'] }}"
@@ -47,9 +49,36 @@
     - disks
   when: >
     item[0]['host']|default(inventory_hostname) == inventory_hostname and
+    item[1]['type']|default('file') == 'file' and
     item[1]['image'] is defined and
     item[1]['size'] is defined and
-    new_image.changed
+    new_image_file.changed
+
+- name: config_vms | Creating VM Disk(s), lvm type
+  lvol:
+    vg: "{{ item[1]['vg'] }}"
+    lv: "{{ item[1]['name'] }}"
+    size: "{{ item[1]['size'] }}M"
+    shrink: 'no'
+  register: new_image_lvm
+  become: true
+  with_subelements:
+    - "{{ kvm_vms }}"
+    - disks
+  when: >
+    item[0]['host']|default(inventory_hostname) == inventory_hostname and
+    item[1]['type']|default('file') == 'lvm'
+
+- name: config_vms | Priming VM Disk(s), lvm type
+  command: "qemu-img convert -f qcow2 -O raw {{ item[1]['image'] }} /dev/mapper/{{ item[1]['vg'] }}-{{ item[1]['name']|regex_replace('-', '--') }}"
+  with_subelements:
+    - "{{ kvm_vms }}"
+    - disks
+  when: >
+    item[0]['host']|default(inventory_hostname) == inventory_hostname and
+    item[1]['type']|default('file') == 'lvm' and
+    item[1]['image'] is defined and
+    new_image_lvm.changed
 
 - name: config_vms | Setting VM State
   virt:
