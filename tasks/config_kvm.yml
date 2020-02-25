@@ -53,3 +53,12 @@
     kvm_enable_tcp and
     ansible_os_family == "Debian" and
     not ansible_check_mode
+
+- name: config_kvm | set permisions
+  file:
+    path: "{{ kvm_images_path }}"
+    owner: 'root'
+    group: "{{ kvm_unix_sock_group }}"
+    mode: '0771'
+  become: true
+
