@@ -41,18 +41,15 @@
 
 - name: config_vms | Creating VM Disk(s), file type, primed disk, resize
   qemu_img:
-    dest: "{{ kvm_images_path }}/{{ item[1]['name'] }}.{{ kvm_images_format_type }}"
-    size: "{{ item[1]['size'] }}"
+    dest: "{{ kvm_images_path }}/{{ item.item[1]['name'] }}.{{ kvm_images_format_type }}"
+    size: "{{ item.item[1]['size'] }}"
   become: true
-  with_subelements:
-    - "{{ kvm_vms }}"
-    - disks
+  with_items: "{{ new_image_file.results }}"
   when: >
-    item[0]['host']|default(inventory_hostname) == inventory_hostname and
-    item[1]['type']|default('file') == 'file' and
-    item[1]['image'] is defined and
-    item[1]['size'] is defined and
-    new_image_file.changed
+    item.item[1]['size'] is defined and
+    item.changed and
+    not item.failed
+
 
 - name: config_vms | Creating VM Disk(s), lvm type
   lvol:
@@ -70,16 +67,13 @@
     item[1]['type']|default('file') == 'lvm'
 
 - name: config_vms | Priming VM Disk(s), lvm type
-  command: "qemu-img convert -f qcow2 -O raw {{ item[1]['image'] }} /dev/mapper/{{ item[1]['vg'] }}-{{ item[1]['name']|regex_replace('-', '--') }}"
-  with_subelements:
-    - "{{ kvm_vms }}"
-    - disks
+  command: "qemu-img convert -f qcow2 -O raw {{ item.item[1]['image'] }} /dev/mapper/{{ item.item[1]['vg'] }}-{{ item.item[1]['name']|regex_replace('-', '--') }}"
+  with_items: "{{ new_image_lvm.results }}"
   when: >
-    item[0]['host']|default(inventory_hostname) == inventory_hostname and
-    item[1]['type']|default('file') == 'lvm' and
-    item[1]['image'] is defined and
-    new_image_lvm.changed
+    item.changed and
+    not item.failed
 
+    
 - name: config_vms | Setting VM State
   virt:
     name: "{{ item['name'] }}"
